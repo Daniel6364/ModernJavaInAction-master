@@ -6,6 +6,7 @@ import modernjavainaction.chap05.Transaction;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class DanielPrac05 {
@@ -27,14 +28,70 @@ public class DanielPrac05 {
 
 
     private List<Transaction> solution01() {
-
         return transactions.stream()
                            .filter(transaction -> transaction.getYear() == 2011)
                            .sorted(Comparator.comparing(Transaction::getValue))
                            .collect(Collectors.toList());
+    }
+
+    private List<String> solution02() {
+        return transactions.stream()
+                           .map(transaction -> transaction.getTrader().getCity())
+                           .distinct()
+                           .collect(Collectors.toList());
+    }
+
+    private List<Trader> solution03() {
+        return transactions.stream()
+                           .map(Transaction::getTrader)
+                           .filter(trader -> trader.getCity().equalsIgnoreCase("cambridge"))
+                           .sorted(Comparator.comparing(Trader::getName))
+                           .distinct()
+                           .collect(Collectors.toList());
+    }
+
+    private String solution04() {
+        return transactions.stream()
+                           .map(transaction -> transaction.getTrader().getName())
+                           .distinct()
+                           .sorted()
+                           .reduce("", (a, b) -> a + b);
 
     }
 
+    /*private Optional<Trader> solution05() {
+        return transactions.stream()
+                           .map(Transaction::getTrader)
+                           .filter(trader -> trader.getCity().equals("Milan"))
+                           .findAny();
+
+    }*/
+
+    private boolean solution05() {
+        return transactions.stream()
+                           .anyMatch(transaction -> transaction.getTrader().getCity().equals("Milan"));
+    }
+
+
+    private List<Integer> solution06() {
+
+        return transactions.stream()
+                           .filter(transaction -> transaction.getTrader().getCity().equals("Cambridge"))
+                           .map(Transaction::getValue)
+                           .collect(Collectors.toList());
+    }
+
+
+    private Integer solution07() {
+        return transactions.stream()
+                           .map(Transaction::getValue)
+                           .reduce(0, Integer::max);
+    }
+
+    private Optional<Transaction> solution08() {
+        return transactions.stream()
+                           .min(Comparator.comparing(Transaction::getValue));
+    }
 
 
 }
