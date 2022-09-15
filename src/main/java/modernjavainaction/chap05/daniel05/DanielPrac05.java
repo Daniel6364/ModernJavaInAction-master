@@ -93,5 +93,10 @@ public class DanielPrac05 {
                            .min(Comparator.comparing(Transaction::getValue));
     }
 
+    private Optional<Integer> solution09() {
+        return transactions.stream()
+                .map(transaction -> transaction.getValue())
+                .reduce((a, b) -> a > b ? b : a);
+    }
 
 }

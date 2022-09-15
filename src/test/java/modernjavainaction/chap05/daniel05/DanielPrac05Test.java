@@ -185,4 +185,18 @@ public class DanielPrac05Test {
         System.out.println("result : " + result);
     }
 
+    @Test
+    public void solution09Test() {
+
+        Optional<Integer> expectResult = Optional.of(300);
+
+        Optional<Integer> result = transactions.stream()
+                                                   .map(transaction -> transaction.getValue())
+                                                   .reduce((a, b) -> a > b ? b : a);;
+
+        Assert.assertEquals(expectResult, result);
+
+        System.out.println("expectResult : " + expectResult);
+        System.out.println("result : " + result);
+    }
 }
