@@ -145,9 +145,9 @@ public class DanielPrac05Test {
         List<Integer> expectResult = Arrays.asList(300, 1000, 400, 950);
 
         List<Integer> result = transactions.stream()
-                                               .filter(transaction -> transaction.getTrader().getCity().equals("Cambridge"))
-                                               .map(Transaction::getValue)
-                                               .collect(Collectors.toList());
+                                           .filter(transaction -> transaction.getTrader().getCity().equals("Cambridge"))
+                                           .map(Transaction::getValue)
+                                           .collect(Collectors.toList());
 
         Assert.assertEquals(expectResult, result);
 
@@ -174,16 +174,14 @@ public class DanielPrac05Test {
     @Test
     public void solution08Test() {
 
-//        Optional<Transaction> expectResult = Arrays.asList(
-//                new Transaction(brian, 2011, 300)
-//        );
+        Optional<Transaction> expectResult = Optional.of(new Transaction(brian, 2011, 300));
 
         Optional<Transaction> result = transactions.stream()
                                                    .min(Comparator.comparing(Transaction::getValue));
 
-//        Assert.assertEquals(expectResult, result);
-//
-//        System.out.println("expectResult : " + expectResult);
+        Assert.assertEquals(expectResult, result);
+
+        System.out.println("expectResult : " + expectResult);
         System.out.println("result : " + result);
     }
 
