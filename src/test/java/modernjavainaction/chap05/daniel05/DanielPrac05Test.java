@@ -1,13 +1,9 @@
 package modernjavainaction.chap05.daniel05;
 
-import junit.framework.TestCase;
 import modernjavainaction.chap05.Trader;
 import modernjavainaction.chap05.Transaction;
-import modernjavainaction.chap10.dsl.model.Trade;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -191,7 +187,7 @@ public class DanielPrac05Test {
         Optional<Integer> expectResult = Optional.of(300);
 
         Optional<Integer> result = transactions.stream()
-                                                   .map(transaction -> transaction.getValue())
+                                                   .map(Transaction::getValue)
                                                    .reduce((a, b) -> a > b ? b : a);;
 
         Assert.assertEquals(expectResult, result);
@@ -199,4 +195,7 @@ public class DanielPrac05Test {
         System.out.println("expectResult : " + expectResult);
         System.out.println("result : " + result);
     }
+
+
+
 }
