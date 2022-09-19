@@ -1,136 +1,137 @@
 package modernjavainaction.chap06.daniel06;
 
+import akka.stream.impl.fusing.Collect;
 import modernjavainaction.chap06.Dish;
-import org.junit.Assert;
+import modernjavainaction.chap06.Grouping;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DanielPrac06Test {
 
-    @Test
-    public void testSolution01() {
+    enum CaloricLever {DIET, NORMAL, FAT}
 
-        Optional<Dish> expectResult = Optional.of(new Dish("pork", false, 800, Dish.Type.MEAT));
-
-        Comparator<Dish> dishComparator = Comparator.comparingInt(Dish::getCalories);
-        Optional<Dish> result = Dish.menu.stream()
-                                         .collect(Collectors.maxBy(dishComparator));
-
-        Assert.assertTrue(result.isPresent());
-        Assert.assertEquals(expectResult.get().getName(), result.get().getName());
-    }
+    ;
 
     @Test
-    public void testSolution02() {
+    public void Solution01Test() {
 
-        int expectResult = 4300;
+        Map<Dish.Type, List<Dish>> dishesByType = Dish.menu.stream().collect(Collectors.groupingBy(Dish::getType));
 
-        int result = Dish.menu.stream()
-                              .collect(Collectors.summingInt(Dish::getCalories));
-
-        Assert.assertEquals(expectResult, result);
-
-        System.out.println("expectResult : " + expectResult);
-        System.out.println("result : " + result);
-
+        System.out.println(dishesByType);
     }
 
 
     @Test
-    public void testSolution03() {
+    public void Solution02Test() {
+        Map<CaloricLever, List<Dish>> dishesByCaloricLevel = Dish.menu.stream().collect(Collectors.groupingBy(dish -> {
+            if (dish.getCalories() <= 400) return CaloricLever.DIET;
+            else if (dish.getCalories() <= 700) return CaloricLever.NORMAL;
+            else return CaloricLever.FAT;
+        }));
 
-        IntSummaryStatistics expectResult = new IntSummaryStatistics(9, 120, 800, 4300);
-
-        IntSummaryStatistics result = Dish.menu.stream()
-                                               .collect(Collectors.summarizingInt(Dish::getCalories));
-
-        System.out.println("expectResult : " + expectResult);
-        System.out.println("result : " + result);
-
-        Double expectResultAverage = expectResult.getAverage();
-        System.out.println(expectResultAverage);
-
-        Double resultAverage = result.getAverage();
-        System.out.println(resultAverage);
-
-        Assert.assertEquals(expectResultAverage, resultAverage);
-
-        long expectResultSum = expectResult.getSum();
-        long resultSum = result.getSum();
-
-        Assert.assertEquals(expectResultSum, resultSum);
+        System.out.println(dishesByCaloricLevel);
     }
 
 
     @Test
-    public void solution04Test() {
+    public void Solution03Test() {
+        Map<Dish.Type, List<Dish>> caloricDishesByType = Dish.menu.stream()
+                                                                  .filter(dish -> dish.getCalories() > 500)
+                                                                  .collect(Collectors.groupingBy(Dish::getType));
+        System.out.println(caloricDishesByType);
 
-        String expectResult = "porkbeefchickenfrench friesriceseason fruitpizzaprawnssalmon";
 
-        String result = Dish.menu.stream()
-                                 .map(Dish::getName).collect(Collectors.joining());
+        Map<Dish.Type, List<Dish>> caloricDishesByType2 = Dish.menu.stream()
+                                                                   .collect(Collectors.groupingBy(Dish::getType,
+                                                                                                  Collectors.filtering(
+                                                                                                          dish -> dish.getCalories() > 500,
+                                                                                                          Collectors.toList())));
+        System.out.println(caloricDishesByType2);
 
-        Assert.assertEquals(expectResult, result);
+        Map<Dish.Type, List<String>> dishNamesByType = Dish.menu.stream()
+                                                                .collect(Collectors.groupingBy(Dish::getType,
+                                                                                               Collectors.mapping(Dish::getName,
+                                                                                                                  Collectors.toList())));
+        System.out.println(dishNamesByType);
 
-        System.out.println("expectResult : " + expectResult);
-        System.out.println("result       : " + result);
 
-        String result2 = Dish.menu.stream()
-                                  .map(Dish::getName).collect(Collectors.joining(", "));
-        System.out.println("result2       : " + result2);
+        Map<Dish.Type, Set<String>> dishNamesByType2 = Dish.menu.stream()
+                                                                .collect(Collectors.groupingBy(Dish::getType,
+                                                                                               Collectors.flatMapping(
+                                                                                                       dish -> Dish.dishTags.get(
+                                                                                                                           dish.getName())
+                                                                                                                            .stream(),
+                                                                                                       Collectors.toSet())));
+        System.out.println(dishNamesByType2);
 
-    }
-
-    @Test
-    public void solution05Test() {
-        int result = Dish.menu.stream()
-                              .collect(Collectors.reducing(0, Dish::getCalories, Integer::sum));
-
-        int result2 = Dish.menu.stream().map(Dish::getCalories).reduce(0, Integer::sum);
-        int result3 = Dish.menu.stream().mapToInt(Dish::getCalories).sum();
-
-        System.out.println(result);
-        System.out.println(result2);
-        System.out.println(result3);
-    }
-
-    @Test
-    public void solution07Test() {
-
-        List<Dish> expectResultList = Arrays.asList(
-                new Dish("prawns", false, 400, Dish.Type.FISH),
-                new Dish("salmon", false, 450, Dish.Type.FISH)
-        );
-
-        Map<Dish.Type, List<Dish>> result = Dish.menu.stream().collect(Collectors.groupingBy(Dish::getType));
-
-        String expectResultName = expectResultList.get(0).getName();
-        String resultName = result.get(Dish.Type.FISH).get(0).getName();
-
-        System.out.println(expectResultName);
-        System.out.println(resultName);
-
-        Assert.assertEquals(expectResultName, resultName);
 
     }
 
     @Test
-    public void solution08Test() {
+    public void Solution04Test() {
 
-        Map<DanielPrac06.CaloricLevel, List<Dish>> result
-                = Dish.menu.stream()
-                           .collect(Collectors.groupingBy(dish -> {
-                               if (dish.getCalories() <= 400) {
-                                   return DanielPrac06.CaloricLevel.DIET;
-                               } else if (dish.getCalories() <= 700) {
-                                   return DanielPrac06.CaloricLevel.NORMAL;
-                               } else {
-                                   return DanielPrac06.CaloricLevel.FAT;
-                               }
-                           }));
-        System.out.println(result);
+        Map<Dish.Type, Map<CaloricLever, List<Dish>>> dishesByTypeCaloricLevel = Dish.menu.stream()
+                                                                                          .collect(Collectors.groupingBy(
+                                                                                                  Dish::getType,
+                                                                                                  Collectors.groupingBy(dish -> {
+                                                                                                      if (dish.getCalories() <= 400)
+                                                                                                          return CaloricLever.DIET;
+                                                                                                      else if (dish.getCalories() < 700)
+                                                                                                          return CaloricLever.NORMAL;
+                                                                                                      else
+                                                                                                          return CaloricLever.FAT;
+                                                                                                  })));
+        System.out.println(dishesByTypeCaloricLevel);
 
+    }
+
+
+    @Test
+    public void Solution05Test() {
+        Map<Dish.Type, Long> typesCount = Dish.menu.stream().collect(Collectors.groupingBy(Dish::getType, Collectors.counting()));
+        System.out.println(typesCount);
+
+
+        Map<Dish.Type, Optional<Dish>> mostCaloricByType = Dish.menu.stream()
+                                                                    .collect(Collectors.groupingBy(Dish::getType,
+                                                                                                   Collectors.maxBy(
+                                                                                                           Comparator.comparing(
+                                                                                                                   Dish::getCalories))));
+        System.out.println(mostCaloricByType);
+
+    }
+
+
+    @Test
+    public void Solution06Test() {
+        Map<Dish.Type, Dish> mostCaloricByType = Dish.menu.stream()
+                                                          .collect(Collectors.groupingBy(Dish::getType,
+                                                                                         Collectors.collectingAndThen(
+                                                                                                 Collectors.maxBy(
+                                                                                                         Comparator.comparing(
+                                                                                                                 Dish::getCalories)),
+                                                                                                 Optional::get)));
+        System.out.println(mostCaloricByType);
+
+        Map<Dish.Type, Dish> mostCaloricByType2 = Dish.menu.stream()
+                                                           .collect(Collectors.toMap(Dish::getType, Function.identity(),
+                                                                                     BinaryOperator.maxBy(Comparator.comparing(
+                                                                                             Dish::getCalories))));
+        System.out.println(mostCaloricByType2);
+
+    }
+
+
+    @Test
+    public void Solution07Test() {
+        Map<Dish.Type, Integer> totalCaloriesByType = Dish.menu.stream()
+                                                               .collect(Collectors.groupingBy(Dish::getType,
+                                                                                              Collectors.summingInt(
+                                                                                                      Dish::getCalories)));
+        System.out.println(totalCaloriesByType);
     }
 }
