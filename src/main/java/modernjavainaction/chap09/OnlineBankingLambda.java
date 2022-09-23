@@ -9,6 +9,7 @@ public class OnlineBankingLambda {
   }
 
   public void processCustomer(int id, Consumer<Customer> makeCustomerHappy) {
+    System.out.println("==// processCustomer");
     Customer c = Database.getCustomerWithId(id);
     makeCustomerHappy.accept(c);
   }

@@ -6,9 +6,16 @@ import java.util.List;
 public class Debugging {
 
   public static void main(String[] args) {
-    List<Point> points = Arrays.asList(new Point(12, 2), null);
-    points.stream().map(p -> p.getX()).forEach(System.out::println);
+//    List<Point> points = Arrays.asList(new Point(12, 2), null);
+//    points.stream().map(p -> p.getX()).forEach(System.out::println);
+
+
+
+
+
   }
+
+
 
   private static class Point {
 
@@ -23,10 +30,22 @@ public class Debugging {
     public int getX() {
       return x;
     }
-
     public void setX(int x) {
       this.x = x;
     }
+
+    public int getY() {
+      return y;
+    }
+
+    public void setY(int y) {
+      this.y = y;
+    }
+
+    public Point moveRightBy(int x) {
+      return new Point(this.x + x, this.y);
+    }
+
 
   }
 
